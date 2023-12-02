@@ -39,6 +39,9 @@ extern Font font;
 extern Music music;
 extern Sound fxCoin;
 
+#define TITLE_FONT_SIZE font.baseSize * 2.0f
+#define STANDARD_TITLE_SPACING 4.0f
+
 #ifdef __cplusplus
 extern "C" {            // Prevents name mangling of functions
 #endif

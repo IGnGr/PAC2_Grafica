@@ -262,8 +262,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\game\src\screens.h" />
+    <ClInclude Include="..\game\src\Player.h" />
+    <ClInclude Include="..\game\src\Scenario.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\game\src\Entities\Player.cpp" />
+    <ClCompile Include="..\game\src\Entities\Scenario.cpp" />
     <ClCompile Include="..\game\src\raylib_game.cpp" />
     <ClCompile Include="..\game\src\screen_ending.cpp" />
     <ClCompile Include="..\game\src\screen_gameplay.cpp" />

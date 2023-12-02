@@ -31,8 +31,8 @@ Sound fxCoin = { 0 };
 //----------------------------------------------------------------------------------
 // Local Variables Definition (local to this module)
 //----------------------------------------------------------------------------------
-static const int screenWidth = 800;
-static const int screenHeight = 450;
+static const int screenWidth = 1280;
+static const int screenHeight = 800;
 
 // Required variables to manage screen transitions (fade-in, fade-out)
 static float transAlpha = 0.0f;
@@ -59,14 +59,14 @@ int main(void)
 {
     // Initialization
     //---------------------------------------------------------
-    InitWindow(screenWidth, screenHeight, "raylib game template");
+    InitWindow(screenWidth, screenHeight, "DONKEY KONG - PAC 2");
 
     InitAudioDevice();      // Initialize audio device
 
     // Load global data (assets that must be available in all screens, i.e. font)
     font = LoadFont("resources/mecha.png");
-    music = LoadMusicStream("resources/ambient.ogg");
-    fxCoin = LoadSound("resources/coin.wav");
+    music = LoadMusicStream("resources/Sound/TitleMusic.mp3");
+    fxCoin = LoadSound("resources/Sound/SFX_BonusPickUp.mp3");
 
     SetMusicVolume(music, 1.0f);
     PlayMusicStream(music);
@@ -84,6 +84,7 @@ int main(void)
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
+
         UpdateDrawFrame();
     }
 #endif
@@ -126,6 +127,9 @@ static void ChangeToScreen(GameScreen screen)
         case TITLE: UnloadTitleScreen(); break;
         case GAMEPLAY: UnloadGameplayScreen(); break;
         case ENDING: UnloadEndingScreen(); break;
+        case OPTIONS: UnloadOptionsScreen(); break;
+
+            
         default: break;
     }
 
@@ -136,6 +140,8 @@ static void ChangeToScreen(GameScreen screen)
         case TITLE: InitTitleScreen(); break;
         case GAMEPLAY: InitGameplayScreen(); break;
         case ENDING: InitEndingScreen(); break;
+        case OPTIONS: InitOptionsScreen(); break;
+
         default: break;
     }
 
@@ -183,6 +189,8 @@ static void UpdateTransition(void)
                 case TITLE: InitTitleScreen(); break;
                 case GAMEPLAY: InitGameplayScreen(); break;
                 case ENDING: InitEndingScreen(); break;
+                case OPTIONS: InitOptionsScreen(); break;
+
                 default: break;
             }
 
@@ -243,7 +251,7 @@ static void UpdateDrawFrame(void)
             {
                 UpdateOptionsScreen();
 
-                if (FinishOptionsScreen()) TransitionToScreen(TITLE);
+                if (FinishOptionsScreen() == 1) TransitionToScreen(TITLE);
 
             } break;
             case GAMEPLAY:
@@ -258,7 +266,9 @@ static void UpdateDrawFrame(void)
             {
                 UpdateEndingScreen();
 
-                if (FinishEndingScreen() == 1) TransitionToScreen(TITLE);
+                if (FinishEndingScreen() == 1) TransitionToScreen(OPTIONS);
+                else if (FinishEndingScreen() == 2) TransitionToScreen(TITLE);
+
 
             } break;
             default: break;

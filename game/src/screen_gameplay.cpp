@@ -25,16 +25,113 @@
 
 #include "raylib.h"
 #include "screens.h"
-
+#include "Player.h"
+#include <iostream>
 //----------------------------------------------------------------------------------
 // Module Variables Definition (local)
 //----------------------------------------------------------------------------------
 static int framesCounter = 0;
 static int finishScreen = 0;
+Music gameplayMusic;
+Player* player;
+Scenario* scenario;
+std::vector<ScenarioRectangle> scenarioRectangles;
+
+static int logoPositionX = 0;
+static int logoPositionY = 0;
+static Texture2D backgroundImage = { 0 };
+
+bool ShowHitbox = true;
+
 
 //----------------------------------------------------------------------------------
 // Gameplay Screen Functions Definition
 //----------------------------------------------------------------------------------
+
+
+void InitializeScenarioRectangles(void)
+{
+
+    //Initial platform
+    ScenarioRectangle* platform1 = new ScenarioRectangle(ScenarioRectangleType::GROUND, { 290, 775 , 700, 25 });
+
+
+    ScenarioRectangle* stairs1 = new ScenarioRectangle(ScenarioRectangleType::STAIRS, { 370, 650 , 15, 125 });
+    ScenarioRectangle* stairs2 = new ScenarioRectangle(ScenarioRectangleType::STAIRS, { 545, 650 , 15, 125 });
+    ScenarioRectangle* stairs3 = new ScenarioRectangle(ScenarioRectangleType::STAIRS, { 720, 650 , 15, 125 });
+    ScenarioRectangle* stairs4 = new ScenarioRectangle(ScenarioRectangleType::STAIRS, { 895, 650 , 15, 125 });
+
+    scenarioRectangles.push_back(*platform1);
+
+    //1st floor
+    ScenarioRectangle* platform2 = new ScenarioRectangle(ScenarioRectangleType::GROUND, { 315, 650 , 650, 25 });
+
+    ScenarioRectangle* stairs5 = new ScenarioRectangle(ScenarioRectangleType::STAIRS, { 495, 525 , 15, 125 });
+    ScenarioRectangle* stairs6 = new ScenarioRectangle(ScenarioRectangleType::STAIRS, { 745, 525 , 15, 125 });
+
+
+
+    scenarioRectangles.push_back(*platform2);
+
+    //2nd floor
+    ScenarioRectangle* platform3 = new ScenarioRectangle(ScenarioRectangleType::GROUND, { 315, 525 , 125, 25 });
+    ScenarioRectangle* platform4 = new ScenarioRectangle(ScenarioRectangleType::GROUND, { 490, 525 , 275, 25 });
+    ScenarioRectangle* platform5 = new ScenarioRectangle(ScenarioRectangleType::GROUND, { 815, 525 , 150, 25 });
+
+
+    ScenarioRectangle* stairs7 = new ScenarioRectangle(ScenarioRectangleType::STAIRS, { 370, 400 , 15, 125 });
+    ScenarioRectangle* stairs8 = new ScenarioRectangle(ScenarioRectangleType::STAIRS, { 545, 400 , 15, 125 });
+    ScenarioRectangle* stairs9 = new ScenarioRectangle(ScenarioRectangleType::STAIRS, { 720, 400 , 15, 125 });
+    ScenarioRectangle* stairs10 = new ScenarioRectangle(ScenarioRectangleType::STAIRS,{ 895, 400 , 15, 125 });
+
+    scenarioRectangles.push_back(*platform3);
+    scenarioRectangles.push_back(*platform4);
+    scenarioRectangles.push_back(*platform5);
+
+
+    //3rd floor
+    ScenarioRectangle* platform6 = new ScenarioRectangle(ScenarioRectangleType::GROUND,{ 290, 400 , 300, 25 });
+    ScenarioRectangle* platform7 = new ScenarioRectangle(ScenarioRectangleType::GROUND,{ 690, 400 , 300, 25 });
+
+
+    ScenarioRectangle* stairs11 = new ScenarioRectangle(ScenarioRectangleType::STAIRS,{ 345, 275 , 15, 125 });
+    ScenarioRectangle* stairs12 = new ScenarioRectangle(ScenarioRectangleType::STAIRS,{ 920, 275 , 15, 125 });
+
+
+    scenarioRectangles.push_back(*platform6);
+    scenarioRectangles.push_back(*platform7);
+
+    //4th floor
+    ScenarioRectangle* platform8 = new ScenarioRectangle(ScenarioRectangleType::GROUND, { 315, 275 , 650, 25 });
+
+    scenarioRectangles.push_back(*platform8);
+
+    ScenarioRectangle* stairs13 = new ScenarioRectangle(ScenarioRectangleType::STAIRS, { 695, 175 , 15, 100 });
+
+
+    //Peach platform
+    ScenarioRectangle* platform9 = new ScenarioRectangle(ScenarioRectangleType::GROUND, { 565, 175 , 150, 25 });
+
+    scenarioRectangles.push_back(*platform9);
+
+
+
+    scenarioRectangles.push_back(*stairs1);
+    scenarioRectangles.push_back(*stairs2);
+    scenarioRectangles.push_back(*stairs3);
+    scenarioRectangles.push_back(*stairs4);
+    scenarioRectangles.push_back(*stairs5);
+    scenarioRectangles.push_back(*stairs6);
+    scenarioRectangles.push_back(*stairs7);
+    scenarioRectangles.push_back(*stairs8);
+    scenarioRectangles.push_back(*stairs9);
+    scenarioRectangles.push_back(*stairs10);
+    scenarioRectangles.push_back(*stairs11);
+    scenarioRectangles.push_back(*stairs12);
+    scenarioRectangles.push_back(*stairs13);
+
+}
+
 
 // Gameplay Screen Initialization logic
 void InitGameplayScreen(void)
@@ -42,35 +139,68 @@ void InitGameplayScreen(void)
     // TODO: Initialize GAMEPLAY screen variables here!
     framesCounter = 0;
     finishScreen = 0;
+
+
+    StopMusicStream(music);
+    gameplayMusic = LoadMusicStream("resources/Sound/StageMusic.mp3");
+    PlayMusicStream(gameplayMusic);
+
+
+    backgroundImage = LoadTexture("resources/Maps/Custom_L2.png");
+
+
+
+    InitializeScenarioRectangles();
+
+    scenario = new Scenario(scenarioRectangles, backgroundImage);
+
+    player = new Player(scenarioRectangles);
+
+
+    
 }
 
 // Gameplay Screen Update logic
 void UpdateGameplayScreen(void)
 {
     // TODO: Update GAMEPLAY screen variables here!
+    UpdateMusicStream(gameplayMusic);
 
     // Press enter or tap to change to ENDING screen
-    if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
+    /*if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
     {
         finishScreen = 1;
         PlaySound(fxCoin);
-    }
+    }*/
+
+    float deltaTime = GetFrameTime();
+
+
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) std::cout << GetMousePosition().x << " " << GetMousePosition().y << std::endl;
+    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) ShowHitbox = !ShowHitbox;
+
+
+    
+    player->Update(deltaTime);
+
 }
 
 // Gameplay Screen Draw logic
 void DrawGameplayScreen(void)
 {
-    // TODO: Draw GAMEPLAY screen here!
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), PURPLE);
-    Vector2 pos = { 20, 10 };
-    DrawTextEx(font, "GAMEPLAY SCREEN", pos, font.baseSize*3.0f, 4, MAROON);
-    DrawText("PRESS ENTER or TAP to JUMP to ENDING SCREEN", 130, 220, 20, MAROON);
+
+
+    scenario->Draw(ShowHitbox);
+
+    //Drawing player
+    player->Draw();
+
 }
 
 // Gameplay Screen Unload logic
 void UnloadGameplayScreen(void)
 {
-    // TODO: Unload GAMEPLAY screen variables here!
+    UnloadMusicStream(gameplayMusic);
 
 }
 

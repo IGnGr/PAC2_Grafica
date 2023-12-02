@@ -26,11 +26,23 @@
 #include "raylib.h"
 #include "screens.h"
 
+#define OPTIONS_TEXT "Press 'O' to see how to play"
+#define PLAY_TEXT "Press 'Enter' to play"
+
 //----------------------------------------------------------------------------------
 // Module Variables Definition (local)
 //----------------------------------------------------------------------------------
 static int framesCounter = 0;
 static int finishScreen = 0;
+static int logoPositionX = 0;
+static int logoPositionY = 0;
+static int offsetBetweenMenuOptions = 100;
+static int optionTextPositionY = 0;
+
+
+
+static Texture2D backgroundImage = { 0 };
+
 
 //----------------------------------------------------------------------------------
 // Title Screen Functions Definition
@@ -42,6 +54,14 @@ void InitTitleScreen(void)
     // TODO: Initialize TITLE screen variables here!
     framesCounter = 0;
     finishScreen = 0;
+
+    backgroundImage = LoadTexture("resources/Menu/DonkeyKongMainLogo.png");
+
+    logoPositionX = GetScreenWidth() / 2 - backgroundImage.width / 2;
+    logoPositionY = GetScreenHeight() / 10 ;
+
+
+    optionTextPositionY = 6 * logoPositionY;
 }
 
 // Title Screen Update logic
@@ -50,28 +70,36 @@ void UpdateTitleScreen(void)
     // TODO: Update TITLE screen variables here!
 
     // Press enter or tap to change to GAMEPLAY screen
-    if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
+    if (IsKeyPressed(KEY_ENTER))
     {
-        //finishScreen = 1;   // OPTIONS
         finishScreen = 2;   // GAMEPLAY
         PlaySound(fxCoin);
     }
+
+    if (IsKeyPressed(KEY_O))
+    {
+        finishScreen = 1;   // OPTIONS
+        PlaySound(fxCoin);
+    }
+
 }
 
 // Title Screen Draw logic
 void DrawTitleScreen(void)
 {
-    // TODO: Draw TITLE screen here!
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), GREEN);
-    Vector2 pos = { 20, 10 };
-    DrawTextEx(font, "TITLE SCREEN", pos, font.baseSize*3.0f, 4, DARKGREEN);
-    DrawText("PRESS ENTER or TAP to JUMP to GAMEPLAY SCREEN", 120, 220, 20, DARKGREEN);
+
+    //Filling the screen with the logo's color
+    DrawTexturePro(backgroundImage, { 0,0,1,1 }, { 0,0, (float)GetScreenWidth(),(float)GetScreenHeight() }, { 0,0 }, 0, WHITE);
+    DrawTexture(backgroundImage, logoPositionX, logoPositionY, WHITE);
+
+    DrawTextEx(font, PLAY_TEXT, { (float)GetScreenWidth() / 2 - MeasureTextEx(font, PLAY_TEXT, TITLE_FONT_SIZE, STANDARD_TITLE_SPACING).x / 2,  (float)optionTextPositionY }, TITLE_FONT_SIZE, STANDARD_TITLE_SPACING, WHITE);
+    DrawTextEx(font, OPTIONS_TEXT, { GetScreenWidth() / 2 - MeasureTextEx(font, OPTIONS_TEXT, TITLE_FONT_SIZE, STANDARD_TITLE_SPACING).x / 2,  (float)optionTextPositionY + offsetBetweenMenuOptions }, TITLE_FONT_SIZE, STANDARD_TITLE_SPACING, WHITE);
 }
 
 // Title Screen Unload logic
 void UnloadTitleScreen(void)
 {
-    // TODO: Unload TITLE screen variables here!
+    UnloadTexture(backgroundImage);
 }
 
 // Title Screen should finish?

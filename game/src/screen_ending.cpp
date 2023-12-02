@@ -47,14 +47,20 @@ void InitEndingScreen(void)
 // Ending Screen Update logic
 void UpdateEndingScreen(void)
 {
-    // TODO: Update ENDING screen variables here!
 
-    // Press enter or tap to return to TITLE screen
-    if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
+    // Press enter or tap to change to GAMEPLAY screen
+    if (IsKeyPressed(KEY_ENTER))
     {
-        finishScreen = 1;
+        finishScreen = 2;   // TITLE
         PlaySound(fxCoin);
     }
+
+    if (IsKeyPressed(KEY_O))
+    {
+        finishScreen = 1;   // OPTIONS
+        PlaySound(fxCoin);
+    }
+
 }
 
 // Ending Screen Draw logic

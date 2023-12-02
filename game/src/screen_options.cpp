@@ -47,13 +47,22 @@ void InitOptionsScreen(void)
 // Options Screen Update logic
 void UpdateOptionsScreen(void)
 {
-    // TODO: Update OPTIONS screen variables here!
+    // Press enter or tap to change to ENDING screen
+    if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
+    {
+        finishScreen = 1;
+        PlaySound(fxCoin);
+    }
 }
 
 // Options Screen Draw logic
 void DrawOptionsScreen(void)
 {
-    // TODO: Draw OPTIONS screen here!
+    // TODO: Draw Options screen here!
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), YELLOW);
+    Vector2 pos = { 20, 10 };
+    DrawTextEx(font, "OPTIONS SCREEN", pos, font.baseSize * 3.0f, 4, MAROON);
+    DrawText("PRESS ENTER or TAP to JUMP to TITLE SCREEN", 130, 220, 20, MAROON);
 }
 
 // Options Screen Unload logic
