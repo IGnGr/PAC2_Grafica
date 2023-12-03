@@ -264,6 +264,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\game\src\Entities\Animation.cpp" />
+    <ClCompile Include="..\game\src\Entities\Enemy.cpp" />
     <ClCompile Include="..\game\src\Entities\Player.cpp" />
     <ClCompile Include="..\game\src\Entities\Scenario.cpp" />
     <ClCompile Include="..\game\src\raylib_game.cpp" />
@@ -280,6 +281,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game\src\Headers\Animation.h" />
+    <ClInclude Include="..\game\src\Headers\Enemy.h" />
     <ClInclude Include="..\game\src\Headers\Player.h" />
     <ClInclude Include="..\game\src\Headers\Scenario.h" />
     <ClInclude Include="..\game\src\Headers\screens.h" />

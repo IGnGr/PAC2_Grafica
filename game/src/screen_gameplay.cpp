@@ -27,6 +27,8 @@
 #include "screens.h"
 #include "Player.h"
 #include <iostream>
+#include <time.h>
+
 //----------------------------------------------------------------------------------
 // Module Variables Definition (local)
 //----------------------------------------------------------------------------------
@@ -133,6 +135,12 @@ void InitializeScenarioRectangles(void)
 }
 
 
+void InitializeEnemies(void)
+{
+
+}
+
+
 // Gameplay Screen Initialization logic
 void InitGameplayScreen(void)
 {
@@ -145,6 +153,7 @@ void InitGameplayScreen(void)
     gameplayMusic = LoadMusicStream("resources/Sound/StageMusic.mp3");
     PlayMusicStream(gameplayMusic);
 
+    srand(time(NULL));
 
     backgroundImage = LoadTexture("resources/Maps/Custom_L2.png");
 
@@ -154,7 +163,7 @@ void InitGameplayScreen(void)
 
     scenario = new Scenario(scenarioRectangles, backgroundImage);
 
-    player = new Player(scenarioRectangles);
+    player = new Player(scenario);
 
 
     
@@ -182,7 +191,11 @@ void UpdateGameplayScreen(void)
     if (IsKeyPressed(KEY_K)) player->Kill();
 
     
+    scenario->Update(deltaTime);
     player->Update(deltaTime);
+
+    if (player->hasWon()) finishScreen = 1;
+    if (player->isDead()) finishScreen = 1;
 
 }
 

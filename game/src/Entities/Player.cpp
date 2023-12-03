@@ -6,7 +6,10 @@
 #define GRAVITY_SPEED 50.0f
 #define STAIRS_SPEED 100.0f
 
-Player::Player(std::vector<ScenarioRectangle>& scenarioRectangle)
+#define MARIO_WIDTH 40.0f
+#define MARIO_HEIGHT 30.0f
+
+Player::Player(Scenario* scenario)
 {
 	m_position = { 310.0f , 745.0f  };
 	m_direction = { 0,0 };
@@ -15,11 +18,15 @@ Player::Player(std::vector<ScenarioRectangle>& scenarioRectangle)
 	m_isInStairs = false;
 	m_isJumping = false;
 	m_isDead = false;
+	m_hasWon = false;
 	m_isDownstairs = false;
+	m_hasDeathAnimationFinished = false;
 	m_sprite = LoadTexture("resources/Characters/Mario_walk_right.png");
 	nSpritesInFile = 3;
 	deathAnimationCount = 2;
-	m_scenarioRectangle = &scenarioRectangle;
+	m_scenario = scenario;
+	m_scenarioRectangle = scenario->GetScenarioRectangles();
+	m_scenarioEnemies = scenario->GetEnemies();
 
 	InitializeAnimations();
 
@@ -85,13 +92,6 @@ void Player::MoveY(float deltaTime)
 		m_position.y += m_speed;
 
 	}
-
-
-
-
-	std::cerr << "m_speed " << m_speed << std::endl;
-
-
 }
 
 
@@ -105,10 +105,10 @@ void Player::IsGrounded(float deltaTime)
 		//if (CheckCollisionRecs(hitBox, rect.GetRectangle()) && rect.GetType() == ScenarioRectangleType::GROUND)
 
 				
-		if(rect.x <= playerHitBox.x &&
-			rect.x + rect.width >= playerHitBox.x &&
-			rect.y  >= playerHitBox.y &&
-			rect.y  <= playerHitBox.y + m_speed &&
+		if(rect.x <= playerHitBox.x + MARIO_WIDTH / 2 &&
+			rect.x + rect.width >= playerHitBox.x + MARIO_WIDTH /2 &&
+			rect.y - MARIO_HEIGHT >= playerHitBox.y &&
+			rect.y - MARIO_HEIGHT <= playerHitBox.y + m_speed &&
 			currentScenarioRectangle.GetType() == ScenarioRectangleType::GROUND)
 		{
 			m_isGrounded = true;
@@ -123,7 +123,7 @@ void Player::IsGrounded(float deltaTime)
 
 bool Player::isDownstairs(Rectangle StairsRectangle, Rectangle playerHitBox)
 {
-	Rectangle newRect = { playerHitBox.x, playerHitBox.y + 1, playerHitBox.width,playerHitBox.height };
+	Rectangle newRect = { playerHitBox.x, playerHitBox.y + 1, playerHitBox.width,1};
 	return CheckCollisionRecs(newRect, StairsRectangle);
 }
 
@@ -140,10 +140,10 @@ void Player::IsInStairs()
 
 		//if (CheckCollisionRecs(hitBox, rect.GetRectangle()) && rect.GetType() == ScenarioRectangleType::STAIRS && m_direction.y != 0)
 		if (currentScenarioRectangle.GetType() == ScenarioRectangleType::STAIRS && 
-			rect.x <= playerHitBox.x &&
-			rect.x + rect.width >= playerHitBox.x &&
-			rect.y + rect.height >= playerHitBox.y  &&
-			rect.y  <= playerHitBox.y )
+			rect.x <= playerHitBox.x + MARIO_WIDTH /2 &&
+			rect.x + rect.width  >= playerHitBox.x + MARIO_WIDTH/2 &&
+			rect.y + rect.height - MARIO_HEIGHT >= playerHitBox.y  &&
+			rect.y - MARIO_HEIGHT <= playerHitBox.y )
 
 		{
 
@@ -152,7 +152,7 @@ void Player::IsInStairs()
 			m_currentAnimationToPlay = m_isGrounded && m_isInStairs ? m_BeginEndClimbAnimation : m_verticalMovementAnimation;
 			
 			m_isInStairs = true;
-			m_isDownstairs = isDownstairs(rect, playerHitBox);
+			m_isDownstairs = isDownstairs({ rect.x,rect.y - MARIO_HEIGHT, rect.height , rect.height }, playerHitBox);
 			return;
 
 		}
@@ -181,6 +181,23 @@ Vector2 Player::GetPosition()
 	return m_position;
 }
 
+void Player::HandleEnemyCollisions(void)
+{
+
+	m_scenarioEnemies = m_scenario->GetEnemies();
+
+	Rectangle playerHitBox = GetHitbox();
+
+	for (auto& enemy : *m_scenarioEnemies)
+	{
+		if (CheckCollisionRecs(playerHitBox, enemy.GetHitbox()))
+		{
+			m_isDead = true;
+		}
+	}
+
+}
+
 bool Player::GetIsGrounded()
 {
 	return m_isGrounded;
@@ -206,6 +223,9 @@ void Player::Update(float deltaTime)
 		MoveY(deltaTime);
 
 		ApplyGravity(deltaTime);
+
+
+		HandleEnemyCollisions();
 	}
 	else
 	{
@@ -222,6 +242,9 @@ void Player::PlayDeathAnimation()
 	if (deathAnimationCount < 0)
 	{
 		m_currentAnimationToPlay = m_deathEndAnimation;
+
+		if (deathAnimationCount < -0.25)
+			m_hasDeathAnimationFinished = true;
 	}
 	else
 	{
@@ -233,7 +256,7 @@ void Player::PlayDeathAnimation()
 
 Rectangle Player::GetHitbox()
 {
-	return {  m_position.x , m_position.y, (float)m_sprite.width / 2* nSpritesInFile,(float)m_sprite.height };
+	return {  m_position.x - MARIO_WIDTH /2 , m_position.y - MARIO_HEIGHT, MARIO_WIDTH, MARIO_HEIGHT };
 }
 
 void Player::HandleInput()
@@ -263,7 +286,7 @@ void Player::HandleInput()
 void Player::Draw()
 {
 	//DrawTexture(m_sprite, m_position.x - m_sprite.width / 2, m_position.y - m_sprite.height, WHITE);
-	//DrawRectangle(m_position.x - m_sprite.width / 2, m_position.y - m_sprite.height, m_sprite.width, m_sprite.height, ORANGE);
+	DrawRectangle(GetHitbox().x, GetHitbox().y, GetHitbox().width, GetHitbox().height, ORANGE);
 
 	//Rectangle source = { 0.0f, 0.0f, (float)m_sprite.width / nSpritesInFile, (float)m_sprite.height };
 	//Rectangle dest = { m_position.x - source.width/ 2,m_position.y - source.height, source.width , source.height };
@@ -285,5 +308,5 @@ bool Player::hasWon()
 
 bool Player::isDead()
 {
-	return m_isDead;
+	return m_isDead && m_hasDeathAnimationFinished;
 }

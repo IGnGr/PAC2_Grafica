@@ -1,4 +1,20 @@
 #include "Scenario.h"
+#include <time.h>
+
+
+#define LEFT_XLIMIT 290
+#define RIGHT_XLIMIT 990
+
+#define CAKES_MAX_SPAWN_TIME 4
+#define CAKES_MIN_SPAWN_TIME 1
+#define CAKES_SPEED 150.0f
+#define CAKES_SPAWN_LOCATION {990,765}
+
+#define BARREL_MIN_SPAWN_TIME 2
+#define BARREL_MAX_SPAWN_TIME 6
+#define FLAME_MIN_SPAWN_TIME 1
+#define FLAME_MAX_SPAWN_TIME 5.5f
+
 
 ScenarioRectangle::ScenarioRectangle()
 {
@@ -7,7 +23,7 @@ ScenarioRectangle::ScenarioRectangle()
 ScenarioRectangle::ScenarioRectangle(ScenarioRectangleType type, Rectangle rectangle)
 {
     m_type = type;
-    m_rectangle = rectangle;
+    m_rectangle = rectangle;    
 }
 
 
@@ -37,6 +53,11 @@ Scenario::Scenario(std::vector<ScenarioRectangle> scenarioRectangles, Texture2D 
 {
     m_scenarioRectangles = scenarioRectangles;
     m_backgroundSprite = backgroundSprite;
+    m_cakesTimeCounter = 0;
+    m_barrelTimeCounter = 0;
+    m_FireFlameCounter = 0;
+
+
 }
 
 
@@ -44,6 +65,7 @@ void Scenario::AddRectangle(ScenarioRectangle rect)
 {
     m_scenarioRectangles.push_back(rect);
 }
+
 
 void Scenario::Draw(bool isHitboxVisible)
 {
@@ -66,4 +88,56 @@ void Scenario::Draw(bool isHitboxVisible)
         }
     }
 
+
+    for (auto enemy : m_scenarioEnemies)
+    {
+        enemy.Draw();
+    }
+
+}
+
+void Scenario::SpawnEnemies(float deltaTime)
+{
+    //Cakes
+    m_cakesTimeCounter -= deltaTime;
+
+
+    if (m_cakesTimeCounter <= 0.0f)
+    {
+        Enemy* newEnemy = new Enemy(CAKES_SPAWN_LOCATION, {-1,0}, CAKES_SPEED, EnemyType::CAKE );
+        m_cakesTimeCounter = (rand() + CAKES_MIN_SPAWN_TIME) % CAKES_MAX_SPAWN_TIME;
+        m_scenarioEnemies.push_back(*newEnemy);
+    }
+
+}
+
+void Scenario::Update(float deltaTime)
+{
+    SpawnEnemies(deltaTime);
+
+    std::vector<Enemy> newEnemyVector;
+
+
+    for (auto &enemy : m_scenarioEnemies)
+    {
+        enemy.Update(deltaTime);
+
+        if (enemy.GetPosition().x >= LEFT_XLIMIT && enemy.GetPosition().x <= RIGHT_XLIMIT)
+        {
+            newEnemyVector.push_back(enemy);
+        }
+    }
+
+    m_scenarioEnemies = newEnemyVector;
+
+}
+
+std::vector<Enemy>* Scenario::GetEnemies(void)
+{
+    return &m_scenarioEnemies;
+}
+
+std::vector<ScenarioRectangle>* Scenario::GetScenarioRectangles(void)
+{
+    return &m_scenarioRectangles;
 }

@@ -8,6 +8,7 @@
 class Player
 {
 private:
+	Scenario* m_scenario;
 	Vector2 m_position;
 	Vector2 m_direction;
 	float m_speed;
@@ -18,6 +19,7 @@ private:
 	bool m_isDownstairs;
 	bool m_isDead;
 	bool m_hasWon;
+	bool m_hasDeathAnimationFinished;
 	int nSpritesInFile;
 	float deathAnimationCount;
 	Texture2D m_sprite;
@@ -30,32 +32,36 @@ private:
 	Animation* m_deathAnimation;
 	Animation* m_deathEndAnimation;
 
-	void PlayDeathAnimation();
 	std::vector<ScenarioRectangle>* m_scenarioRectangle;
+	std::vector<Enemy>* m_scenarioEnemies;
+
 	void InitializeAnimations();
 
 
 public:
-	Player(std::vector<ScenarioRectangle>& scenarioRectangle);
+	Player(Scenario* scenario);
 	void Jump(float deltaTime);
 	void MoveX(float deltaTime);
 	void MoveY(float deltaTime);
 
 	void IsGrounded(float deltaTime);
-	void IsInStairs();
+	void IsInStairs(void);
 	Vector2 getSpriteCenter(const Texture2D& sprite);
 	bool isDownstairs(Rectangle StairsRectangle, Rectangle playerHitBox);
 	void ApplyGravity(float deltaTime);
-	Texture2D GetSprite();
-	Rectangle GetHitbox();
-	Vector2 GetPosition();
-	bool GetIsGrounded();
-	float GetSpeed();
+	Texture2D GetSprite(void);
+	Rectangle GetHitbox(void);
+	Vector2 GetPosition(void);
+	void HandleEnemyCollisions(void);
+	bool GetIsGrounded(void);
+	float GetSpeed(void);
 	void Update(float deltaTime);
-	void HandleInput();
-	void Draw();
-	void Kill();
-	bool hasWon();
-	bool isDead();
+	void HandleInput(void);
+	void Draw(void);
+	void Kill(void);
+	bool hasWon(void);
+	bool isDead(void);
+	void PlayDeathAnimation(void);
+
 };
 

@@ -18,13 +18,16 @@
     <ClInclude Include="..\game\src\Headers\Animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\src\Headers\Player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\game\src\Headers\Scenario.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\game\src\Headers\screens.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\src\Headers\Player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\src\Headers\Enemy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -57,6 +60,9 @@
       <Filter>Source Files\Entitites</Filter>
     </ClCompile>
     <ClCompile Include="..\game\src\Entities\Scenario.cpp">
+      <Filter>Source Files\Entitites</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\src\Entities\Enemy.cpp">
       <Filter>Source Files\Entitites</Filter>
     </ClCompile>
   </ItemGroup>
