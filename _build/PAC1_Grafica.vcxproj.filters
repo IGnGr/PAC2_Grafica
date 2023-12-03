@@ -12,13 +12,19 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\game\src\screens.h">
+    <ClInclude Include="..\game\src\Entities\Animation.cpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\src\Scenario.h">
+    <ClInclude Include="..\game\src\Headers\Animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\src\Player.h">
+    <ClInclude Include="..\game\src\Headers\Player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\src\Headers\Scenario.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\src\Headers\screens.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -40,6 +46,12 @@
     </ClCompile>
     <ClCompile Include="..\game\src\screen_title.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\src\Headers\Animation.h">
+      <Filter>Source Files\Entitites</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\src\Entities\Animation.cpp">
+      <Filter>Source Files\Entitites</Filter>
     </ClCompile>
     <ClCompile Include="..\game\src\Entities\Player.cpp">
       <Filter>Source Files\Entitites</Filter>

@@ -179,6 +179,7 @@ void UpdateGameplayScreen(void)
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) std::cout << GetMousePosition().x << " " << GetMousePosition().y << std::endl;
     if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) ShowHitbox = !ShowHitbox;
 
+    if (IsKeyPressed(KEY_K)) player->Kill();
 
     
     player->Update(deltaTime);

@@ -14,10 +14,40 @@ Player::Player(std::vector<ScenarioRectangle>& scenarioRectangle)
 	m_isGrounded = false;
 	m_isInStairs = false;
 	m_isJumping = false;
+	m_isDead = false;
 	m_isDownstairs = false;
-	m_sprite = LoadTexture("resources/Characters/Mario_Death_Idle.png");
+	m_sprite = LoadTexture("resources/Characters/Mario_walk_right.png");
+	nSpritesInFile = 3;
+	deathAnimationCount = 2;
 	m_scenarioRectangle = &scenarioRectangle;
+
+	InitializeAnimations();
+
+	m_currentAnimationToPlay = m_horizontalRightMovementAnimation;
 }
+
+
+void Player::InitializeAnimations()
+{
+	Texture2D rightHorizontalMovementSprite = LoadTexture("resources/Characters/Mario_walk_right.png");
+	m_horizontalRightMovementAnimation = new Animation(rightHorizontalMovementSprite, 3, 10, m_position);
+
+	Texture2D leftHorizontalMovementSprite = LoadTexture("resources/Characters/Mario_walk_left.png");
+	m_horizontalLeftMovementAnimation = new Animation(leftHorizontalMovementSprite, 3, 10, m_position);
+
+	Texture2D verticalMovementSprite = LoadTexture("resources/Characters/Mario_Climb.png");
+	m_verticalMovementAnimation = new Animation(verticalMovementSprite, 6, 10, m_position);
+
+	Texture2D BeginEndClimbSprite = LoadTexture("resources/Characters/Mario_Idle_Climb.png");
+	m_BeginEndClimbAnimation = new Animation(BeginEndClimbSprite, 1, 1, m_position);
+
+	Texture2D deathSprite = LoadTexture("resources/Characters/Mario_Death.png");
+	m_deathAnimation = new Animation(deathSprite, 4, 10, m_position);
+
+	Texture2D endDeathSprite = LoadTexture("resources/Characters/Mario_Death_Idle.png");
+	m_deathEndAnimation = new Animation(endDeathSprite, 1, 10, m_position);
+}
+
 
 void Player::Jump(float deltaTime)
 {
@@ -28,8 +58,13 @@ void Player::Jump(float deltaTime)
 
 void Player::MoveX(float deltaTime)
 {
-	if(m_isGrounded || m_isJumping)
+	if (m_isGrounded || m_isJumping)
+	{
 		m_position.x += m_direction.x * H_SPEED * deltaTime;
+	}
+
+	m_currentAnimationToPlay = m_direction.x > 0 && (m_isGrounded || m_isJumping )? m_horizontalRightMovementAnimation : m_currentAnimationToPlay;
+	m_currentAnimationToPlay = m_direction.x < 0 && (m_isGrounded || m_isJumping) ? m_horizontalLeftMovementAnimation : m_currentAnimationToPlay;
 
 }
 
@@ -43,6 +78,7 @@ void Player::MoveY(float deltaTime)
 			m_position.y -= m_direction.y * STAIRS_SPEED * deltaTime;
 			m_speed = -m_direction.y * STAIRS_SPEED * deltaTime;
 		}
+
 	}
 	else
 	{
@@ -110,9 +146,15 @@ void Player::IsInStairs()
 			rect.y  <= playerHitBox.y )
 
 		{
- 			m_isInStairs = true;
-			m_isDownstairs = isDownstairs(rect,playerHitBox);
+
+
+			//Determines the correct animation for the climbing
+			m_currentAnimationToPlay = m_isGrounded && m_isInStairs ? m_BeginEndClimbAnimation : m_verticalMovementAnimation;
+			
+			m_isInStairs = true;
+			m_isDownstairs = isDownstairs(rect, playerHitBox);
 			return;
+
 		}
 	}
 
@@ -151,28 +193,47 @@ float Player::GetSpeed()
 
 void Player::Update(float deltaTime)
 {
+	if (!m_isDead) 
+	{
+		HandleInput();
 
-	HandleInput();
+		IsGrounded(deltaTime);
 
+		IsInStairs();
 
+		MoveX(deltaTime);
 
-	IsGrounded(deltaTime);
+		MoveY(deltaTime);
 
-	IsInStairs();
+		ApplyGravity(deltaTime);
+	}
+	else
+	{
+		PlayDeathAnimation();
+	}
 
-	MoveX(deltaTime);
+	m_currentAnimationToPlay->Update(m_position);
+}
 
-	MoveY(deltaTime);
+void Player::PlayDeathAnimation() 
+{
+	deathAnimationCount -= GetFrameTime();
 
-	ApplyGravity(deltaTime);
-
-
+	if (deathAnimationCount < 0)
+	{
+		m_currentAnimationToPlay = m_deathEndAnimation;
+	}
+	else
+	{
+		m_currentAnimationToPlay = m_deathAnimation;
+	}
 
 }
 
+
 Rectangle Player::GetHitbox()
 {
-	return {  m_position.x , m_position.y, (float)m_sprite.width,(float)m_sprite.height };
+	return {  m_position.x , m_position.y, (float)m_sprite.width / 2* nSpritesInFile,(float)m_sprite.height };
 }
 
 void Player::HandleInput()
@@ -192,11 +253,37 @@ void Player::HandleInput()
 
 }
 
+ Vector2 Player::getSpriteCenter(const Texture2D& sprite)
+{
+	return { (float)sprite.width / 2 * nSpritesInFile, (float)sprite.height / 2};
+}
+
+
 
 void Player::Draw()
 {
 	//DrawTexture(m_sprite, m_position.x - m_sprite.width / 2, m_position.y - m_sprite.height, WHITE);
-	DrawRectangle(m_position.x - m_sprite.width / 2, m_position.y - m_sprite.height, m_sprite.width, m_sprite.height, ORANGE);
-	//DrawTexturePro(m_sprite, { 0.0f, 0.0f, (float)m_sprite.width, (float)m_sprite.height }, { m_position.x, m_position.y, (float)m_sprite.width, (float)m_sprite.height }, getSpriteCenter(m_sprite), 0, ORANGE);
+	//DrawRectangle(m_position.x - m_sprite.width / 2, m_position.y - m_sprite.height, m_sprite.width, m_sprite.height, ORANGE);
 
+	//Rectangle source = { 0.0f, 0.0f, (float)m_sprite.width / nSpritesInFile, (float)m_sprite.height };
+	//Rectangle dest = { m_position.x - source.width/ 2,m_position.y - source.height, source.width , source.height };
+
+	//DrawTexturePro(m_sprite, source, dest,  { 0,0 }, 0, WHITE);
+	m_currentAnimationToPlay->Draw();
+
+}
+
+void Player::Kill()
+{
+	m_isDead = true;
+}
+
+bool Player::hasWon()
+{
+	return m_hasWon;
+}
+
+bool Player::isDead()
+{
+	return m_isDead;
 }
