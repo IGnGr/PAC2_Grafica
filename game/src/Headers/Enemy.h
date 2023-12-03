@@ -12,6 +12,7 @@ class Enemy
 private:
 	Vector2 m_position;
 	Vector2 m_direction;
+	Texture2D m_sprite;
 	float m_speed;
 	Animation* m_currentAnimationToPlay;
 	Rectangle m_hitBox;

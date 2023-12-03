@@ -1,0 +1,10 @@
+﻿  raudio.c
+  rcore.c
+  rglfw.c
+  rmodels.c
+  rshapes.c
+  rtext.c
+  rtextures.c
+  utils.c
+  Generating Code...
+  raylib.vcxproj -> C:\Users\frank\Desktop\UOC\Prog. Grafica\PAC2\_bin\Release\raylib.lib

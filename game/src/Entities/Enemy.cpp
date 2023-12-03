@@ -8,51 +8,49 @@ Enemy::Enemy(Vector2 position, Vector2 direction , float speed, EnemyType enemyT
 	m_speed = speed;
 	m_enemyType = enemyType;
 	m_hasBeenJumped = false;
-
 	SetAnimation();
 
 
 }
 
+
 void Enemy::SetAnimation()
 {
-	Texture2D sprite;
+	switch (m_enemyType){
 
-	switch (m_enemyType)
-	{
 	case EnemyType::CAKE: 
-		sprite = LoadTexture("resources/Enemies/Cake.png");
-		m_currentAnimationToPlay = new Animation(sprite, 1, 1, m_position);
-		m_width = sprite.width;
-		m_height = sprite.height;
+		m_sprite = LoadTexture("resources/Enemies/Cake.png");
+		m_currentAnimationToPlay = new Animation(m_sprite, 1, 1, m_position);
+		m_width = m_sprite.width;
+		m_height = m_sprite.height;
 
 		break;
 	case EnemyType::BARREL:
-		sprite = LoadTexture("resources/Enemies/Barrel.png");
-		m_currentAnimationToPlay = new Animation(sprite, 4, 10, m_position);
-		m_width = sprite.width /4 ;
-		m_height = sprite.height;
+		m_sprite = LoadTexture("resources/Enemies/Barrel.png");
+		m_currentAnimationToPlay = new Animation(m_sprite, 4, 10, m_position);
+		m_width = m_sprite.width /4 ;
+		m_height = m_sprite.height;
 
 		break;
 	case EnemyType::FIREBARREL:
-		sprite = LoadTexture("resources/Enemies/BurningBarrel.png");
-		m_currentAnimationToPlay = new Animation(sprite, 1, 1, m_position);
-		m_width = sprite.width;
-		m_height = sprite.height;
+		m_sprite = LoadTexture("resources/Enemies/BurningBarrel.png");
+		m_currentAnimationToPlay = new Animation(m_sprite, 1, 1, m_position);
+		m_width = m_sprite.width;
+		m_height = m_sprite.height;
 
 		break;
 	case EnemyType::FLARE: 
-		sprite = LoadTexture("resources/Enemies/FireFlame.png");
-		m_currentAnimationToPlay = new Animation(sprite, 1, 1, m_position);
-		m_width = sprite.width;
-		m_height = sprite.height;
+		m_sprite = LoadTexture("resources/Enemies/FireFlame.png");
+		m_currentAnimationToPlay = new Animation(m_sprite, 1, 1, m_position);
+		m_width = m_sprite.width;
+		m_height = m_sprite.height;
 
 		break;
 	case EnemyType::KINGKONG: 
-		sprite = LoadTexture("resources/Enemies/DonkeyKong.png");
-		m_currentAnimationToPlay = new Animation(sprite, 4, 10, m_position);
-		m_width = sprite.width / 4;
-		m_height = sprite.height;
+		m_sprite = LoadTexture("resources/Enemies/DonkeyKong.png");
+		m_currentAnimationToPlay = new Animation(m_sprite, 4, 10, m_position);
+		m_width = m_sprite.width / 4;
+		m_height = m_sprite.height;
 
 		break;
 	default: break;

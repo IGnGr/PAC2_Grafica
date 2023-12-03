@@ -63,7 +63,7 @@ void UpdateLogoScreen(void)
 
     framesCounter++;
 
-    if (framesCounter > 20)
+    if (framesCounter > 200)
     {
         finishScreen = 1;   // Jump to next screen
     }

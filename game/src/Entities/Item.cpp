@@ -5,6 +5,7 @@ Item::Item(Vector2 position, Texture2D sprite, ItemType itemType)
 	m_position = position;
 	m_itemType = itemType;
 	m_sprite = sprite;
+	m_enabled = true;
 }
 
 Rectangle Item::GetHitbox()

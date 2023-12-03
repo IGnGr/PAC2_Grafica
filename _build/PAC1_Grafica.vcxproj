@@ -98,7 +98,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\_bin\Debug\</OutDir>
-    <IntDir>obj\x64\Debug\PAC1_Grafica\</IntDir>
+    <IntDir>obj\x64\Debug\PAC2_Grafica\</IntDir>
     <TargetName>PAC2_Grafica</TargetName>
     <TargetExt>.exe</TargetExt>
     <IncludePath>C:\Users\frank\Desktop\UOC\Prog. Grafica\PAC2\game\src;$(IncludePath)</IncludePath>
@@ -120,7 +120,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\_bin\Release\</OutDir>
-    <IntDir>obj\x64\Release\PAC1_Grafica\</IntDir>
+    <IntDir>obj\x64\Release\PAC2_Grafica\</IntDir>
     <TargetName>PAC2_Grafica</TargetName>
     <TargetExt>.exe</TargetExt>
     <IncludePath>C:\Users\frank\Desktop\UOC\Prog. Grafica\PAC2\game\src;$(IncludePath)</IncludePath>
