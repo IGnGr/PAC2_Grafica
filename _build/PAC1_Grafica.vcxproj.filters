@@ -30,6 +30,12 @@
     <ClInclude Include="..\game\src\Headers\Enemy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\game\src\Headers\Item.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\src\Headers\SoundManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\game\src\raylib_game.cpp">
@@ -63,6 +69,15 @@
       <Filter>Source Files\Entitites</Filter>
     </ClCompile>
     <ClCompile Include="..\game\src\Entities\Enemy.cpp">
+      <Filter>Source Files\Entitites</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\src\IOHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\src\Entities\Item.cpp">
+      <Filter>Source Files\Entitites</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\src\Entities\SoundManager.cpp">
       <Filter>Source Files\Entitites</Filter>
     </ClCompile>
   </ItemGroup>

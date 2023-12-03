@@ -1,17 +1,24 @@
 #include "Player.h"
 #include <iostream>
+#include <string>
+#include "screens.h"
 
 #define V_SPEED 600.0f
 #define H_SPEED 300.0f
 #define GRAVITY_SPEED 50.0f
+#define STARTING_POSITION { 310.0f , 745.0f  }
 #define STAIRS_SPEED 100.0f
+#define STARTING_LIVES 3
+#define SCORE_POSITION { 50.0f, 100.0f}
+#define LIVES_POSITIONX 1000.0f
+#define LIVES_POSITIONY 100.0f
 
-#define MARIO_WIDTH 40.0f
-#define MARIO_HEIGHT 30.0f
+#define LIVES_SPACING 50.0f
+
 
 Player::Player(Scenario* scenario)
 {
-	m_position = { 310.0f , 745.0f  };
+	m_position = STARTING_POSITION;
 	m_direction = { 0,0 };
 	m_speed = 0.0f;
 	m_isGrounded = false;
@@ -23,11 +30,15 @@ Player::Player(Scenario* scenario)
 	m_hasDeathAnimationFinished = false;
 	m_sprite = LoadTexture("resources/Characters/Mario_walk_right.png");
 	nSpritesInFile = 3;
+	m_points = 0;
 	deathAnimationCount = 2;
+	m_lives = STARTING_LIVES;
 	m_scenario = scenario;
 	m_scenarioRectangle = scenario->GetScenarioRectangles();
 	m_scenarioEnemies = scenario->GetEnemies();
-
+	m_width = m_sprite.width / nSpritesInFile;
+	m_height = m_sprite.height;
+	m_soundManager = new SoundManager();
 	InitializeAnimations();
 
 	m_currentAnimationToPlay = m_horizontalRightMovementAnimation;
@@ -61,6 +72,8 @@ void Player::Jump(float deltaTime)
 	//m_position.y -= speed;
 	m_speed = -V_SPEED* deltaTime;
 	m_isJumping = true;
+	m_soundManager->PlayJumpSound();
+
 }
 
 void Player::MoveX(float deltaTime)
@@ -68,10 +81,16 @@ void Player::MoveX(float deltaTime)
 	if (m_isGrounded || m_isJumping)
 	{
 		m_position.x += m_direction.x * H_SPEED * deltaTime;
+
 	}
 
 	m_currentAnimationToPlay = m_direction.x > 0 && (m_isGrounded || m_isJumping )? m_horizontalRightMovementAnimation : m_currentAnimationToPlay;
 	m_currentAnimationToPlay = m_direction.x < 0 && (m_isGrounded || m_isJumping) ? m_horizontalLeftMovementAnimation : m_currentAnimationToPlay;
+
+	if (m_isGrounded)
+	{
+		m_soundManager->PlayWalkingSound();
+	}
 
 }
 
@@ -105,10 +124,10 @@ void Player::IsGrounded(float deltaTime)
 		//if (CheckCollisionRecs(hitBox, rect.GetRectangle()) && rect.GetType() == ScenarioRectangleType::GROUND)
 
 				
-		if(rect.x <= playerHitBox.x + MARIO_WIDTH / 2 &&
-			rect.x + rect.width >= playerHitBox.x + MARIO_WIDTH /2 &&
-			rect.y - MARIO_HEIGHT >= playerHitBox.y &&
-			rect.y - MARIO_HEIGHT <= playerHitBox.y + m_speed &&
+		if(rect.x <= playerHitBox.x + m_width / 2 &&
+			rect.x + rect.width >= playerHitBox.x + m_width /2 &&
+			rect.y - m_height >= playerHitBox.y &&
+			rect.y - m_height <= playerHitBox.y + m_speed &&
 			currentScenarioRectangle.GetType() == ScenarioRectangleType::GROUND)
 		{
 			m_isGrounded = true;
@@ -140,10 +159,10 @@ void Player::IsInStairs()
 
 		//if (CheckCollisionRecs(hitBox, rect.GetRectangle()) && rect.GetType() == ScenarioRectangleType::STAIRS && m_direction.y != 0)
 		if (currentScenarioRectangle.GetType() == ScenarioRectangleType::STAIRS && 
-			rect.x <= playerHitBox.x + MARIO_WIDTH /2 &&
-			rect.x + rect.width  >= playerHitBox.x + MARIO_WIDTH/2 &&
-			rect.y + rect.height - MARIO_HEIGHT >= playerHitBox.y  &&
-			rect.y - MARIO_HEIGHT <= playerHitBox.y )
+			rect.x <= playerHitBox.x + m_width /2 &&
+			rect.x + rect.width  >= playerHitBox.x + m_width/2 &&
+			rect.y + rect.height - m_height >= playerHitBox.y  &&
+			rect.y - m_height <= playerHitBox.y )
 
 		{
 
@@ -152,7 +171,7 @@ void Player::IsInStairs()
 			m_currentAnimationToPlay = m_isGrounded && m_isInStairs ? m_BeginEndClimbAnimation : m_verticalMovementAnimation;
 			
 			m_isInStairs = true;
-			m_isDownstairs = isDownstairs({ rect.x,rect.y - MARIO_HEIGHT, rect.height , rect.height }, playerHitBox);
+			m_isDownstairs = isDownstairs({ rect.x,rect.y - m_height, rect.height , rect.height }, playerHitBox);
 			return;
 
 		}
@@ -192,7 +211,23 @@ void Player::HandleEnemyCollisions(void)
 	{
 		if (CheckCollisionRecs(playerHitBox, enemy.GetHitbox()))
 		{
+			if (enemy.GetType() == EnemyType::KINGKONG)
+				m_lives = 0;
+			else
+				m_lives--;
+
+
+			m_scenario->clearAllEnemies();
 			m_isDead = true;
+			
+		}
+
+
+		Rectangle hitboxDown = { playerHitBox.x,playerHitBox.y + playerHitBox.height, playerHitBox.width, playerHitBox.height };
+		if (CheckCollisionRecs( hitboxDown, enemy.GetHitbox()) && !enemy.HasBeenJumped() && m_isJumping)
+		{
+			m_points += 50;
+			enemy.MarkJumped();
 		}
 	}
 
@@ -206,6 +241,47 @@ bool Player::GetIsGrounded()
 float Player::GetSpeed()
 {
 	return m_speed;
+}
+
+void Player::CheckIfPositionIsValid()
+{
+	if (m_position.y > GetScreenHeight())
+	{
+		m_position = STARTING_POSITION;
+		m_lives--;
+		m_isDead = true;
+	}
+}
+
+void Player::HandleItemsCollisions(void)
+{
+	m_scenarioItems = m_scenario->GetScenarioItems();
+
+	Rectangle playerHitBox = GetHitbox();
+
+	for (auto& item : *m_scenarioItems)
+	{
+		if (CheckCollisionRecs(playerHitBox, item.GetHitbox()) && item.isEnabled())
+		{
+			if (item.GetType() == ItemType::PEACH)
+			{
+				m_hasWon = true;
+				SaveStorageValue(0, 2);
+				m_soundManager->PlayClearStageMusic();
+			}
+				
+			if (item.GetType() == ItemType::BONUS1)
+				m_points += 100;
+			if (item.GetType() == ItemType::BONUS2)
+				m_points += 200;
+			if (item.GetType() == ItemType::BONUS3)
+				m_points += 300;
+
+			PlaySound(fxCoin);
+			item.Disable();
+		}
+	}
+
 }
 
 void Player::Update(float deltaTime)
@@ -224,8 +300,15 @@ void Player::Update(float deltaTime)
 
 		ApplyGravity(deltaTime);
 
-
 		HandleEnemyCollisions();
+
+		HandleItemsCollisions();
+
+		CheckIfPositionIsValid();
+
+		m_soundManager->Update(deltaTime);
+
+
 	}
 	else
 	{
@@ -244,7 +327,12 @@ void Player::PlayDeathAnimation()
 		m_currentAnimationToPlay = m_deathEndAnimation;
 
 		if (deathAnimationCount < -0.25)
+		{
 			m_hasDeathAnimationFinished = true;
+			deathAnimationCount = 2;
+			m_isDead = false;
+		}
+			
 	}
 	else
 	{
@@ -256,7 +344,7 @@ void Player::PlayDeathAnimation()
 
 Rectangle Player::GetHitbox()
 {
-	return {  m_position.x - MARIO_WIDTH /2 , m_position.y - MARIO_HEIGHT, MARIO_WIDTH, MARIO_HEIGHT };
+	return {  m_position.x - m_width /2 , m_position.y - m_height, m_width, m_height };
 }
 
 void Player::HandleInput()
@@ -276,24 +364,38 @@ void Player::HandleInput()
 
 }
 
- Vector2 Player::getSpriteCenter(const Texture2D& sprite)
-{
-	return { (float)sprite.width / 2 * nSpritesInFile, (float)sprite.height / 2};
-}
-
 
 
 void Player::Draw()
 {
 	//DrawTexture(m_sprite, m_position.x - m_sprite.width / 2, m_position.y - m_sprite.height, WHITE);
-	DrawRectangle(GetHitbox().x, GetHitbox().y, GetHitbox().width, GetHitbox().height, ORANGE);
+	//DrawRectangle(GetHitbox().x, GetHitbox().y, GetHitbox().width, GetHitbox().height, ORANGE);
 
 	//Rectangle source = { 0.0f, 0.0f, (float)m_sprite.width / nSpritesInFile, (float)m_sprite.height };
 	//Rectangle dest = { m_position.x - source.width/ 2,m_position.y - source.height, source.width , source.height };
 
 	//DrawTexturePro(m_sprite, source, dest,  { 0,0 }, 0, WHITE);
+
+
+	//Score
+	DrawTextEx(font, TextFormat("SCORE: %d", m_points), SCORE_POSITION, 40.0f, 2.0f, WHITE);
+
+	//Lives
+	DrawLives();
+
 	m_currentAnimationToPlay->Draw();
 
+}
+
+void Player::DrawLives()
+{
+	for (int i = 0; i < m_lives; i++)
+	{
+		Rectangle source = { m_sprite.width / nSpritesInFile, 0.0f, (float)m_sprite.width / nSpritesInFile, (float)m_sprite.height };
+		Rectangle dest = { LIVES_POSITIONX + i* LIVES_SPACING  ,LIVES_POSITIONY, source.width , source.height };
+
+
+		DrawTexturePro(m_sprite, source, dest,  { 0,0 }, 0, WHITE);	}
 }
 
 void Player::Kill()
@@ -308,5 +410,11 @@ bool Player::hasWon()
 
 bool Player::isDead()
 {
-	return m_isDead && m_hasDeathAnimationFinished;
+	if (m_lives <= 0 && m_hasDeathAnimationFinished)
+	{
+		SaveStorageValue(0, 1);
+		return true;
+
+	}
+	return false;
 }

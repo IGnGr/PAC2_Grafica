@@ -4,6 +4,8 @@
 #include <vector>
 #include "Scenario.h"
 #include "Animation.h"
+#include "Item.h"
+#include "SoundManager.h"
 
 class Player
 {
@@ -11,7 +13,11 @@ private:
 	Scenario* m_scenario;
 	Vector2 m_position;
 	Vector2 m_direction;
+	int m_lives;
+	int m_points;
 	float m_speed;
+	float m_width;
+	float m_height;
 	bool m_isGrounded;
 	bool m_isInStairs;
 	bool m_canJump;
@@ -34,6 +40,9 @@ private:
 
 	std::vector<ScenarioRectangle>* m_scenarioRectangle;
 	std::vector<Enemy>* m_scenarioEnemies;
+	std::vector<Item>* m_scenarioItems;
+
+	SoundManager* m_soundManager;
 
 	void InitializeAnimations();
 
@@ -46,7 +55,6 @@ public:
 
 	void IsGrounded(float deltaTime);
 	void IsInStairs(void);
-	Vector2 getSpriteCenter(const Texture2D& sprite);
 	bool isDownstairs(Rectangle StairsRectangle, Rectangle playerHitBox);
 	void ApplyGravity(float deltaTime);
 	Texture2D GetSprite(void);
@@ -62,6 +70,9 @@ public:
 	bool hasWon(void);
 	bool isDead(void);
 	void PlayDeathAnimation(void);
+	void CheckIfPositionIsValid(void);
+	void HandleItemsCollisions(void);
+	void DrawLives(void);
 
 };
 

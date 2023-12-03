@@ -40,7 +40,7 @@ extern Music music;
 extern Sound fxCoin;
 
 #define TITLE_FONT_SIZE font.baseSize * 2.0f
-#define STANDARD_TITLE_SPACING 4.0f
+#define STANDARD_TITLE_SPACING 2.0f
 
 #ifdef __cplusplus
 extern "C" {            // Prevents name mangling of functions
@@ -90,6 +90,10 @@ void UpdateEndingScreen(void);
 void DrawEndingScreen(void);
 void UnloadEndingScreen(void);
 int FinishEndingScreen(void);
+
+// Persistent storage functions
+bool SaveStorageValue(unsigned int position, int value);
+int LoadStorageValue(unsigned int position);
 
 #ifdef __cplusplus
 }

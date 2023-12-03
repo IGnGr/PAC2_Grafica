@@ -43,7 +43,7 @@ static int logoPositionX = 0;
 static int logoPositionY = 0;
 static Texture2D backgroundImage = { 0 };
 
-bool ShowHitbox = true;
+bool ShowHitbox = false;
 
 
 //----------------------------------------------------------------------------------

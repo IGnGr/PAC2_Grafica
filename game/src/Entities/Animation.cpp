@@ -31,10 +31,10 @@ void Animation::Draw()
 {
 
 
-	Rectangle source = { m_currentIndex * m_sourceSprite.width / m_nTotalSprites , 0.0f, (float)m_sourceSprite.width / m_nTotalSprites, (float)m_sourceSprite.height };
-	Rectangle dest = { m_position.x - source.width / 2,m_position.y - source.height, source.width , source.height };
+	Rectangle source = { m_currentIndex * m_sourceSprite.width / m_nTotalSprites , 0.0f, (float) m_sourceSprite.width / m_nTotalSprites, (float)m_sourceSprite.height };
+	Rectangle dest = { m_position.x ,m_position.y , source.width , source.height };
 
-	DrawTexturePro(m_sourceSprite, source, dest, { 0,0 }, 0, WHITE);
+	DrawTexturePro(m_sourceSprite, source, dest, { source.width/2 ,  source.height }, 0, WHITE);
 
 }
 

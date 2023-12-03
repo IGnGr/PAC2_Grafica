@@ -55,15 +55,32 @@ void UpdateOptionsScreen(void)
     }
 }
 
+
+    static void DrawTextExCentered(Font font, const char* text, float fontSize, float spacing, Color tint, int offsetY)
+    {
+        Vector2 position;
+        position.x = GetScreenWidth() / 2 - MeasureTextEx(font, text, fontSize, spacing).x / 2;
+        position.y = GetScreenHeight() / 2 - MeasureTextEx(font, text, fontSize, spacing).y / 2 + offsetY;
+        DrawTextEx(font, text, position, fontSize, spacing, tint);
+    }
+
+
+
+
 // Options Screen Draw logic
 void DrawOptionsScreen(void)
 {
-    // TODO: Draw Options screen here!
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), YELLOW);
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLACK);
+
     Vector2 pos = { 20, 10 };
-    DrawTextEx(font, "OPTIONS SCREEN", pos, font.baseSize * 3.0f, 4, MAROON);
-    DrawText("PRESS ENTER or TAP to JUMP to TITLE SCREEN", 130, 220, 20, MAROON);
+
+
+    DrawTextExCentered(font, "YOU MUST SAVE PRINCESS PEACH. CLIMB USING THE LADDERS!", TITLE_FONT_SIZE, STANDARD_TITLE_SPACING, WHITE, 0);
+    DrawTextExCentered(font, "USE THE KEYS 'WASD' OR THE ARROWS FOR MOVING AND SPACE TO JUMP", TITLE_FONT_SIZE, STANDARD_TITLE_SPACING, WHITE, 50);
+    DrawTextExCentered(font, "YOU CAN NOW PRESS 'ENTER' TO GO BACK TO THE MAIN MENU", TITLE_FONT_SIZE, STANDARD_TITLE_SPACING, WHITE, 200);
+
 }
+
 
 // Options Screen Unload logic
 void UnloadOptionsScreen(void)

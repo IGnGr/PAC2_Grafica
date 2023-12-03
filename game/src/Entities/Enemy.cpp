@@ -7,10 +7,9 @@ Enemy::Enemy(Vector2 position, Vector2 direction , float speed, EnemyType enemyT
 	m_direction = direction;
 	m_speed = speed;
 	m_enemyType = enemyType;
+	m_hasBeenJumped = false;
 
 	SetAnimation();
-
-	m_hitBox = { position.x - m_width /2 , position.y - m_height , m_width, m_height };
 
 
 }
@@ -62,28 +61,47 @@ void Enemy::SetAnimation()
 
 }
 
+EnemyType Enemy::GetType()
+{
+	return m_enemyType;
+}
+
+void Enemy::ReverseDirection()
+{
+	m_direction.x = -m_direction.x;
+}
+
+bool Enemy::HasBeenJumped(void)
+{
+	return m_hasBeenJumped;
+}
+
+void Enemy::MarkJumped(void)
+{
+	m_hasBeenJumped = true;
+}
+
 void Enemy::MoveX(float deltaTime)
 {
 	m_position.x += m_direction.x * m_speed * deltaTime;
 }
 
 
-Rectangle Enemy::GetHitbox()
-{
-	return m_hitBox;
-}
-
 Vector2 Enemy::GetPosition()
 {
 	return m_position;
 }
 
+
+
+Rectangle Enemy::GetHitbox()
+{
+	return { m_position.x - m_width / 2 , m_position.y - m_height, m_width, m_height };
+}
+
 void Enemy::Update(float deltaTime)
 {
 	MoveX(deltaTime);
-
-	m_hitBox.x = m_position.x;
-	m_hitBox.y = m_position.y;
 
 	m_currentAnimationToPlay->Update(m_position);
 
@@ -91,7 +109,7 @@ void Enemy::Update(float deltaTime)
 
 void Enemy::Draw()
 {
-	DrawRectangle(GetHitbox().x, GetHitbox().y, GetHitbox().width, GetHitbox().height, PURPLE);
+	//DrawRectangle(GetHitbox().x, GetHitbox().y, GetHitbox().width, GetHitbox().height, PURPLE);
 	m_currentAnimationToPlay->Draw();
 }
 

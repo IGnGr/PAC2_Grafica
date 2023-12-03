@@ -26,12 +26,16 @@
 #include "raylib.h"
 #include "screens.h"
 
+#define GOOD_ENDING_TEXT "CONGRATULATIONS, YOU'VE SAVED THE PRINCESS."
+#define BAD_ENDING_TEXT "OH NO, YOU WERE UNABLE TO SAVE THE PRINCESS."
+#define REST_OF_TEXT "PRESS 'O' TO GO TO THE OPTIONS OR 'ENTER' TO GO TO THE TITLE SCREEN"
+
 //----------------------------------------------------------------------------------
 // Module Variables Definition (local)
 //----------------------------------------------------------------------------------
 static int framesCounter = 0;
 static int finishScreen = 0;
-
+unsigned int ending = 0;
 //----------------------------------------------------------------------------------
 // Ending Screen Functions Definition
 //----------------------------------------------------------------------------------
@@ -42,6 +46,11 @@ void InitEndingScreen(void)
     // TODO: Initialize ENDING screen variables here!
     framesCounter = 0;
     finishScreen = 0;
+
+
+    // 1 = Death ; 2 = Win 
+    ending = LoadStorageValue(0);
+
 }
 
 // Ending Screen Update logic
@@ -63,17 +72,30 @@ void UpdateEndingScreen(void)
 
 }
 
+static void DrawTextExCentered(Font font, const char* text, float fontSize, float spacing, Color tint, int offsetY)
+{
+    Vector2 position;
+    position.x = GetScreenWidth() / 2 - MeasureTextEx(font, text, fontSize, spacing).x / 2;
+    position.y = GetScreenHeight() / 2 - MeasureTextEx(font, text, fontSize, spacing).y / 2 + offsetY;
+    DrawTextEx(font, text, position, fontSize, spacing, tint);
+}
+
 // Ending Screen Draw logic
 void DrawEndingScreen(void)
 {
-    // TODO: Draw ENDING screen here!
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLUE);
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLACK);
 
     Vector2 pos = { 20, 10 };
-    DrawTextEx(font, "ENDING SCREEN", pos, font.baseSize*3.0f, 4, DARKBLUE);
-    DrawText("PRESS ENTER or TAP to RETURN to TITLE SCREEN", 120, 220, 20, DARKBLUE);
-}
 
+    if(ending == 2)
+        DrawTextExCentered(font, GOOD_ENDING_TEXT , TITLE_FONT_SIZE, STANDARD_TITLE_SPACING, WHITE, 0);
+    else
+        DrawTextExCentered(font, BAD_ENDING_TEXT, TITLE_FONT_SIZE, STANDARD_TITLE_SPACING, WHITE, 0);
+
+
+    DrawTextExCentered(font, REST_OF_TEXT, TITLE_FONT_SIZE, STANDARD_TITLE_SPACING, WHITE, 50);
+
+}
 // Ending Screen Unload logic
 void UnloadEndingScreen(void)
 {

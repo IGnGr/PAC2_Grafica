@@ -3,6 +3,7 @@
 #include "raylib.h"
 #include <vector>
 #include "Enemy.h"
+#include "Item.h"
 
 typedef enum ScenarioRectangleType { GROUND = 0, STAIRS = 1 } ScenarioRectangleType;
 
@@ -27,6 +28,7 @@ class Scenario
 private:
     std::vector<ScenarioRectangle> m_scenarioRectangles;
     std::vector<Enemy> m_scenarioEnemies;
+    std::vector<Item> m_scenarioItems;
 
 
     Texture2D m_backgroundSprite;
@@ -42,9 +44,15 @@ public:
     void AddRectangle(ScenarioRectangle rect);
     void Draw(bool isHitboxVisible);
     void SpawnEnemies(float deltaTime);
+    void SpawnItems(void);
     void Update(float deltaTime);
     std::vector<Enemy>* GetEnemies(void);
     std::vector<ScenarioRectangle>* GetScenarioRectangles(void);
+    std::vector<Item>* GetScenarioItems(void);
+
+    void clearAllEnemies(void);
+
+    void SpawnPermanentEnemies();
 
 
 };

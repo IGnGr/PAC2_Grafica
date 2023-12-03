@@ -18,6 +18,7 @@ private:
 	EnemyType m_enemyType;
 	float m_width;
 	float m_height;
+	bool m_hasBeenJumped;
 
 
 
@@ -30,7 +31,9 @@ public:
 	void Update(float deltaTime);
 	void Draw();
 	void SetAnimation();
-
-
+	EnemyType GetType();
+	void ReverseDirection();
+	bool HasBeenJumped(void);
+	void MarkJumped(void);
 };
 
